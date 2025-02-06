@@ -1,17 +1,36 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
+import Profile from "./pages/Profile";
+import Explore from "./pages/Explore";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import NotFound from "./pages/NotFound";
+import "./styles/App.css";
+import Navbar from "./components/Navbar";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+function PrivateRoute({ children }) {
+  const { user } = useAuth();
+  return user ? children : <Navigate to="/login" />;
+}
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+          <Route path="/explore" element={<PrivateRoute><Explore /></PrivateRoute>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
+}
+
+export default App;
